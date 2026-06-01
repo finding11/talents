@@ -1,0 +1,51 @@
+{
+  "common": {
+    "brand": "Finding11",
+    "tagline": "Discover your next eleven.",
+    "talents": "Talents",
+    "recruiters": "Recruiters",
+    "discover": "Discover",
+    "login": "Log in",
+    "signup": "Sign up",
+    "logout": "Log out",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "search": "Search",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "testMode": "TEST MODE — Stripe payments are in test mode"
+  },
+  "home": {
+    "heroTitle": "Where talent meets the starting lineup",
+    "heroSubtitle": "Soccer players showcase skills for free. Recruiters unlock contact details when they're ready to connect.",
+    "ctaTalent": "Create your profile",
+    "ctaRecruiter": "Discover talents",
+    "featureFree": "Free for talents",
+    "featurePay": "Pay only to unlock contact",
+    "featureSoccer": "Built for soccer scouts"
+  },
+  "talent": {
+    "unlockContact": "Unlock contact",
+    "contactHidden": "Contact details are protected",
+    "contactUnlocked": "Contact unlocked",
+    "minorBadge": "Minor profile",
+    "positions": "Positions",
+    "height": "Height",
+    "foot": "Preferred foot",
+    "league": "League",
+    "team": "Team"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signUpTalent": "Sign up as talent",
+    "signUpRecruiter": "Sign up as recruiter",
+    "noAccount": "Don't have an account?"
+  },
+  "payments": {
+    "unlockFor": "Unlock contact for {name}",
+    "refundPolicy": "Refunds available within 3 days if contact info is invalid."
+  }
+}
