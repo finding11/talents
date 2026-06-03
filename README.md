@@ -37,11 +37,15 @@ Open http://localhost:3000
 
 ## Cloudflare Pages deploy
 
-**Build settings:**
+**Build settings (important — do NOT use `.next` as output):**
 
-- Framework: Next.js
-- Build command: `npm install && npm run build`
-- Output: `.next` (or use Cloudflare’s Next.js preset)
+| Setting | Value |
+|---------|--------|
+| Build command | `npm run pages:build` |
+| Build output directory | `.open-next` |
+| Production branch | `main` |
+
+The app uses `@opennextjs/cloudflare` so Cloudflare deploys a Worker + assets instead of uploading the raw `.next/cache` folder (which exceeds the 25 MiB file limit).
 
 **Required environment variables** (Pages → Settings → Environment variables):
 
