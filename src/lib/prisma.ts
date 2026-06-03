@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaNeonHTTP } from "@prisma/adapter-neon";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
@@ -16,35 +16,33 @@ function normalizeDatabaseUrl(url: string): string {
 }
 
 function readDatabaseUrl(): string {
-  let url = process.env.DATABASE_URL;
+  let url: string | undefined;
 
-  if (!url) {
-    try {
-      const workerEnv = getCloudflareContext().env as { DATABASE_URL?: string };
-      if (typeof workerEnv.DATABASE_URL === "string") {
-        url = workerEnv.DATABASE_URL;
-        process.env.DATABASE_URL = url;
-      }
-    } catch {
-      // Not running inside the OpenNext worker (e.g. next build).
+  try {
+    const workerEnv = getCloudflareContext().env as { DATABASE_URL?: string };
+    if (typeof workerEnv.DATABASE_URL === "string") {
+      url = workerEnv.DATABASE_URL;
     }
+  } catch {
+    // Build step or dev without worker context.
   }
+
+  url ??= process.env.DATABASE_URL;
 
   if (!url) {
     throw new Error("DATABASE_URL is not set");
   }
 
+  process.env.DATABASE_URL ??= url;
   return normalizeDatabaseUrl(url);
 }
 
 function createPrismaClient(): PrismaClient {
   const connectionString = readDatabaseUrl();
 
-  // Required for Neon on Cloudflare Workers (see neondatabase/serverless#128).
-  neonConfig.webSocketConstructor = WebSocket;
   neonConfig.fetchFunction = fetch;
 
-  const adapter = new PrismaNeon({ connectionString, maxUses: 1 });
+  const adapter = new PrismaNeonHTTP(connectionString, {});
 
   return new PrismaClient({
     adapter,
