@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "pages:build": "prisma generate && opennextjs-cloudflare build",
+    "cf:deploy": "opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "start": "next start",
