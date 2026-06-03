@@ -1,13 +1,21 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "finding11-staging",
-  "main": "open-next/worker.js",
-  "compatibility_date": "2025-06-01",
+  "compatibility_date": "2024-12-30",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "global_fetch_strictly_public"
   ],
+  "pages_build_output_dir": ".open-next",
+  "main": ".open-next/worker.js",
   "assets": {
-    "directory": "open-next/assets",
-    "binding": "ASSETS_BINDING"     // ← Changed from ASSETS
-  }
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "finding11-staging"
+    }
+  ]
 }
