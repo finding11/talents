@@ -16,7 +16,6 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.7.4",
     "@prisma/client": "^6.1.0",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.4",
@@ -38,6 +37,11 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"
+  },
+  "overrides": {
+    "preact": "10.24.3",
+    "@emnapi/core": "1.10.0",
+    "@emnapi/runtime": "1.10.0"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
