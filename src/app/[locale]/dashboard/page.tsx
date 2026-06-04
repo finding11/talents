@@ -33,12 +33,6 @@ export default async function DashboardPage() {
             >
               View public profile →
             </Link>
-            <Link
-              href="/dashboard/edit"
-              className="ml-4 inline-block text-pitch-400 hover:underline"
-            >
-              Edit profile →
-            </Link>
           </div>
         ) : (
           <p className="mt-4 text-white/60">Complete your profile setup.</p>

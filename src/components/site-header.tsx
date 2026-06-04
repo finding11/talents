@@ -28,7 +28,7 @@ export async function SiteHeader() {
               Dashboard
             </LocaleLink>
           ) : (
-            <LocaleLink href="/signup?role=recruiter" className="hover:text-white">
+            <LocaleLink href={{ pathname: "/signup", query: { role: "recruiter" } }} className="hover:text-white">
               {t("recruiters")}
             </LocaleLink>
           )}

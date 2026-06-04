@@ -163,7 +163,7 @@ export function ContactGate({
       {needsRecruiter && (
         <p className="mt-4 text-sm text-amber-300/90">
           Talent accounts cannot unlock contacts.{" "}
-          <Link href="/signup?role=recruiter" className="text-pitch-400 hover:underline">
+          <Link href={{ pathname: "/signup", query: { role: "recruiter" } }} className="text-pitch-400 hover:underline">
             Join as recruiter
           </Link>
         </p>

@@ -11,11 +11,12 @@ import {
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+  role: z.enum(["TALENT", "RECRUITER"]),
 });
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = schema.parse(await req.json());
+    const { email, password, role } = schema.parse(await req.json());
     const prisma = getDb();
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -28,6 +29,18 @@ export async function POST(req: Request) {
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+    }
+
+    if (user.role !== role && user.role !== "ADMIN") {
+      return NextResponse.json(
+        {
+          error:
+            role === "TALENT"
+              ? "This email belongs to a recruiter account. Switch to Recruiter above."
+              : "This email belongs to a talent account. Switch to Talent above.",
+        },
+        { status: 403 }
+      );
     }
 
     const token = await createSessionToken({

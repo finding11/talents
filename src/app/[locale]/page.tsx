@@ -20,7 +20,7 @@ export default async function HomePage() {
           <p className="mx-auto mt-6 max-w-2xl text-lg text-white/70">{t("heroSubtitle")}</p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" asChild>
-              <Link href="/signup?role=talent">{t("ctaTalent")}</Link>
+              <Link href={{ pathname: "/signup", query: { role: "talent" } }}>{t("ctaTalent")}</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
               <Link href="/discover">{t("ctaRecruiter")}</Link>

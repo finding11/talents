@@ -7,16 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatRegisterError } from "@/lib/format-error";
-
-type SignupRole = "TALENT" | "RECRUITER";
+import { RoleToggle, type AccountRole } from "@/components/role-toggle";
 
 type SignupFormProps = {
-  defaultRole?: SignupRole;
+  defaultRole?: AccountRole;
 };
 
 export function SignupForm({ defaultRole = "TALENT" }: SignupFormProps) {
   const router = useRouter();
-  const [role, setRole] = useState<SignupRole>(defaultRole);
+  const [role, setRole] = useState<AccountRole>(defaultRole);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showGuardian, setShowGuardian] = useState(false);
@@ -77,8 +76,13 @@ export function SignupForm({ defaultRole = "TALENT" }: SignupFormProps) {
       alert(`Guardian must sign consent at: ${data.consentUrl}`);
     }
 
-    router.push("/en/login");
+    router.push(role === "RECRUITER" ? "/en/login?role=recruiter" : "/en/login?role=talent");
   }
+
+  const loginHref =
+    role === "RECRUITER"
+      ? ({ pathname: "/login" as const, query: { role: "recruiter" } })
+      : ({ pathname: "/login" as const, query: { role: "talent" } });
 
   return (
     <div className="mx-auto max-w-lg px-4 py-12">
@@ -88,35 +92,7 @@ export function SignupForm({ defaultRole = "TALENT" }: SignupFormProps) {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-        <div>
-          <Label>I am signing up as</Label>
-          <div className="mt-2 grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setRole("TALENT")}
-              className={`rounded-lg border px-4 py-3 text-left text-sm transition ${
-                role === "TALENT"
-                  ? "border-pitch-500 bg-pitch-500/15 text-white"
-                  : "border-white/10 bg-white/5 text-white/70 hover:border-white/20"
-              }`}
-            >
-              <span className="block font-semibold">Talent</span>
-              <span className="mt-1 block text-xs opacity-80">Showcase skills to scouts</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("RECRUITER")}
-              className={`rounded-lg border px-4 py-3 text-left text-sm transition ${
-                role === "RECRUITER"
-                  ? "border-pitch-500 bg-pitch-500/15 text-white"
-                  : "border-white/10 bg-white/5 text-white/70 hover:border-white/20"
-              }`}
-            >
-              <span className="block font-semibold">Recruiter</span>
-              <span className="mt-1 block text-xs opacity-80">Discover and unlock players</span>
-            </button>
-          </div>
-        </div>
+        <RoleToggle role={role} onChange={setRole} label="I am signing up as" />
 
         {role === "TALENT" ? (
           <div>
@@ -180,7 +156,7 @@ export function SignupForm({ defaultRole = "TALENT" }: SignupFormProps) {
 
       <p className="mt-6 text-center text-sm text-white/50">
         Already have an account?{" "}
-        <Link href="/login" className="text-pitch-400 hover:underline">
+        <Link href={loginHref} className="text-pitch-400 hover:underline">
           Sign in
         </Link>
       </p>
