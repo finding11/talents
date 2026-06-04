@@ -144,6 +144,11 @@ export default async function TalentProfilePage({
             priceCents={priceCents}
             locale={locale}
             canView={canView}
+            auth={
+              session?.user
+                ? { isLoggedIn: true, role: session.user.role }
+                : { isLoggedIn: false }
+            }
             contact={
               canView && talent.privateContact
                 ? {

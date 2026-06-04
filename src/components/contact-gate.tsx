@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Link } from "@/i18n/routing";
 import { Button } from "./ui/button";
 import { formatEUR } from "@/lib/utils";
 
@@ -11,6 +12,10 @@ type ContactGateProps = {
   priceCents: number;
   locale: string;
   canView: boolean;
+  auth?: {
+    isLoggedIn: boolean;
+    role?: string;
+  };
   contact?: {
     email?: string | null;
     phone?: string | null;
@@ -21,6 +26,11 @@ type ContactGateProps = {
   } | null;
 };
 
+function loginRedirectUrl(locale: string, talentSlug: string) {
+  const returnTo = `/${locale}/talent/${talentSlug}`;
+  return `/${locale}/login?callbackUrl=${encodeURIComponent(returnTo)}`;
+}
+
 export function ContactGate({
   talentId,
   talentSlug,
@@ -28,11 +38,25 @@ export function ContactGate({
   priceCents,
   locale,
   canView,
+  auth,
   contact,
 }: ContactGateProps) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleUnlock() {
+    setError("");
+
+    if (!auth?.isLoggedIn) {
+      window.location.href = loginRedirectUrl(locale, talentSlug);
+      return;
+    }
+
+    if (auth.role !== "RECRUITER" && auth.role !== "ADMIN") {
+      setError("Only recruiter accounts can unlock contact details.");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/stripe/checkout", {
@@ -41,7 +65,25 @@ export function ContactGate({
         body: JSON.stringify({ talentId, talentSlug }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+
+      if (res.status === 401) {
+        window.location.href = loginRedirectUrl(locale, talentSlug);
+        return;
+      }
+
+      if (!res.ok) {
+        setError(typeof data.error === "string" ? data.error : "Checkout failed. Please try again.");
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setError("Checkout did not return a payment link. Please try again.");
+    } catch {
+      setError("Network error. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -102,6 +144,10 @@ export function ContactGate({
     );
   }
 
+  const needsLogin = !auth?.isLoggedIn;
+  const needsRecruiter =
+    auth?.isLoggedIn && auth.role !== "RECRUITER" && auth.role !== "ADMIN";
+
   return (
     <div className="rounded-xl border border-white/10 bg-navy-800/80 p-6 text-center">
       <h3 className="font-semibold text-white">Contact details protected</h3>
@@ -110,8 +156,27 @@ export function ContactGate({
       </p>
       <p className="mt-4 text-2xl font-bold text-pitch-400">{formatEUR(priceCents, locale)}</p>
       <p className="mt-1 text-xs text-white/40">One-time unlock · Refunds within 3 days if invalid</p>
-      <Button className="mt-6 w-full" size="lg" onClick={handleUnlock} disabled={loading}>
-        {loading ? "Redirecting…" : `Unlock contact — ${formatEUR(priceCents, locale)}`}
+
+      {needsLogin && (
+        <p className="mt-4 text-sm text-white/50">Sign in with a recruiter account to continue.</p>
+      )}
+      {needsRecruiter && (
+        <p className="mt-4 text-sm text-amber-300/90">
+          Talent accounts cannot unlock contacts.{" "}
+          <Link href="/signup/recruiter" className="text-pitch-400 hover:underline">
+            Join as recruiter
+          </Link>
+        </p>
+      )}
+
+      {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+
+      <Button className="mt-6 w-full" size="lg" onClick={handleUnlock} disabled={loading || needsRecruiter}>
+        {loading
+          ? "Redirecting…"
+          : needsLogin
+            ? "Sign in to unlock"
+            : `Unlock contact — ${formatEUR(priceCents, locale)}`}
       </Button>
     </div>
   );

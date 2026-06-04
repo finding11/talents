@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { hash } from "bcryptjs";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import { getDb } from "@/lib/prisma";
+import { hashPassword } from "@/lib/password";
 import { slugify, isMinor } from "@/lib/utils";
 
 const schema = z.object({
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email already registered" }, { status: 400 });
     }
 
-    const passwordHash = await hash(body.password, 12);
+    const passwordHash = await hashPassword(body.password);
     const user = await prisma.user.create({
       data: {
         email,
@@ -95,9 +96,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     if (e instanceof z.ZodError) {
-      return NextResponse.json({ error: e.errors }, { status: 400 });
+      const message = e.errors.map((err) => `${err.path.join(".") || "field"}: ${err.message}`).join("; ");
+      return NextResponse.json({ error: message }, { status: 400 });
     }
+
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+      return NextResponse.json({ error: "Email already registered" }, { status: 400 });
+    }
+
     console.error(e);
-    return NextResponse.json({ error: "Registration failed" }, { status: 500 });
+    const detail = e instanceof Error ? e.message : undefined;
+    const isStaging =
+      process.env.NODE_ENV !== "production" ||
+      process.env.NEXT_PUBLIC_APP_URL?.includes("staging.") ||
+      process.env.NEXT_PUBLIC_APP_URL?.includes("workers.dev");
+
+    return NextResponse.json(
+      {
+        error: "Registration failed",
+        ...(isStaging && detail ? { detail } : {}),
+      },
+      { status: 500 }
+    );
   }
 }

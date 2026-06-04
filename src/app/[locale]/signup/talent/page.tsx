@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatRegisterError } from "@/lib/format-error";
 
 export default function TalentSignupPage() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function TalentSignupPage() {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Signup failed");
+      setError(formatRegisterError(data.error, data.detail));
       return;
     }
     if (data.needsConsent && data.consentUrl) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatRegisterError } from "@/lib/format-error";
 
 export default function RecruiterSignupPage() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function RecruiterSignupPage() {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(typeof data.error === "string" ? data.error : "Signup failed");
+      setError(formatRegisterError(data.error, data.detail));
       return;
     }
     router.push("/en/login");
