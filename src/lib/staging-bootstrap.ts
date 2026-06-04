@@ -1,5 +1,11 @@
 import type { PrismaClient } from "@prisma/client";
 import { hashPassword } from "./password";
+import { readRuntimeEnv } from "./runtime-env";
+
+export function isStagingHost(): boolean {
+  const url = readRuntimeEnv("NEXT_PUBLIC_APP_URL") ?? readRuntimeEnv("NEXTAUTH_URL") ?? "";
+  return url.includes("workers.dev") || url.includes("staging.");
+}
 
 const DEMO_VIDEO =
   "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";

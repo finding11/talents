@@ -1,17 +1,10 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/prisma";
-import { bootstrapStaging } from "@/lib/staging-bootstrap";
-import { readRuntimeEnv } from "@/lib/runtime-env";
+import { bootstrapStaging, isStagingHost } from "@/lib/staging-bootstrap";
 
 export const dynamic = "force-dynamic";
 
-function isStagingHost(): boolean {
-  const url = readRuntimeEnv("NEXT_PUBLIC_APP_URL") ?? readRuntimeEnv("NEXTAUTH_URL") ?? "";
-  return url.includes("workers.dev") || url.includes("staging.");
-}
-
-/** One-time staging setup: demo highlight videos + Worker-safe demo passwords. */
-export async function POST() {
+async function runBootstrap() {
   if (!isStagingHost()) {
     return NextResponse.json({ error: "Not available outside staging" }, { status: 403 });
   }
@@ -27,4 +20,13 @@ export async function POST() {
       { status: 500 }
     );
   }
+}
+
+/** One-time staging setup: demo highlight videos + Worker-safe demo passwords. */
+export async function GET() {
+  return runBootstrap();
+}
+
+export async function POST() {
+  return runBootstrap();
 }
