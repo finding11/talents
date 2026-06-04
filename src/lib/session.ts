@@ -1,6 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { headers } from "next/headers";
-import { appEnv } from "./env";
+import { readRuntimeEnv } from "./runtime-env";
 
 export type AppSession = {
   user: {
@@ -15,7 +15,7 @@ export async function getSession(): Promise<AppSession | null> {
     const headersList = await headers();
     const token = await getToken({
       req: { headers: headersList } as Parameters<typeof getToken>[0]["req"],
-      secret: appEnv.nextAuthSecret,
+      secret: readRuntimeEnv("NEXTAUTH_SECRET"),
     });
 
     if (!token?.email) return null;

@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const diagnostics: Record<string, unknown> = {
     processEnvDatabaseUrl: Boolean(process.env.DATABASE_URL),
+    processEnvNextAuthSecret: Boolean(process.env.NEXTAUTH_SECRET),
   };
 
   try {
@@ -15,6 +16,7 @@ export async function GET() {
     diagnostics.workerEnvKeys = Object.keys(env).filter(
       (key) => typeof (env as Record<string, unknown>)[key] === "string"
     );
+    diagnostics.workerNextAuthSecret = Boolean((env as { NEXTAUTH_SECRET?: unknown }).NEXTAUTH_SECRET);
   } catch (error) {
     diagnostics.cloudflareContextError = error instanceof Error ? error.message : String(error);
   }
@@ -22,8 +24,10 @@ export async function GET() {
   try {
     const prisma = getDb();
     const count = await prisma.talentProfile.count();
+    const mediaCount = await prisma.mediaAsset.count();
     diagnostics.dbOk = true;
     diagnostics.talentCount = count;
+    diagnostics.mediaCount = mediaCount;
   } catch (error) {
     diagnostics.dbOk = false;
     diagnostics.dbError = error instanceof Error ? error.message : String(error);
