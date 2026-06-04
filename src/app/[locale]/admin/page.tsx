@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { getDb } from "@/lib/prisma";
 import { getSiteSettings } from "@/lib/pricing";
 import { formatEUR } from "@/lib/utils";
@@ -8,7 +7,7 @@ import { formatEUR } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
   if (!session?.user || session.user.role !== "ADMIN") redirect("/en/login");
 
   const settings = await getSiteSettings();

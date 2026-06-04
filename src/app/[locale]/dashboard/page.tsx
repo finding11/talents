@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { getDb } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
 import { formatEUR } from "@/lib/utils";
@@ -8,7 +7,7 @@ import { formatEUR } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
   if (!session?.user) redirect("/en/login");
 
   const prisma = getDb();

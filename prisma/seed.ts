@@ -3,6 +3,26 @@ import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+const DEMO_VIDEO =
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+
+async function seedHighlight(talentSlug: string, title: string) {
+  const talent = await prisma.talentProfile.findUnique({ where: { slug: talentSlug } });
+  if (!talent) return;
+
+  await prisma.mediaAsset.deleteMany({ where: { talentId: talent.id } });
+  await prisma.mediaAsset.create({
+    data: {
+      talentId: talent.id,
+      type: "video",
+      title,
+      url: DEMO_VIDEO,
+      status: "READY",
+      sortOrder: 0,
+    },
+  });
+}
+
 async function main() {
   await prisma.siteSettings.upsert({
     where: { id: "default" },
@@ -105,6 +125,9 @@ async function main() {
     },
     update: {},
   });
+
+  await seedHighlight("alex-rivera", "Winger highlights");
+  await seedHighlight("marco-silva", "Midfield highlights");
 
   console.log("Seed complete. Demo logins (password: demo12345):");
   console.log("  admin@finding11.com (ADMIN)");

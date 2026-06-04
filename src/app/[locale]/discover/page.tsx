@@ -31,6 +31,13 @@ export default async function DiscoverPage({
     },
     orderBy: { createdAt: "desc" },
     take: 24,
+    include: {
+      media: {
+        where: { status: "READY" },
+        orderBy: { sortOrder: "asc" },
+        take: 1,
+      },
+    },
   });
 
   const positions = ["ST", "LW", "RW", "CAM", "CM", "CDM", "CB", "LB", "RB", "GK"];

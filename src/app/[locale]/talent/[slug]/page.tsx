@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { getDb } from "@/lib/prisma";
 import { canViewPrivateContact } from "@/lib/access";
 import { getUnlockPriceCents } from "@/lib/pricing";
@@ -19,7 +18,7 @@ export default async function TalentProfilePage({
 }) {
   const { locale, slug } = await params;
   const { unlocked } = await searchParams;
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
 
   const prisma = getDb();
   const talent = await prisma.talentProfile.findUnique({
@@ -145,7 +144,18 @@ export default async function TalentProfilePage({
             priceCents={priceCents}
             locale={locale}
             canView={canView}
-            contact={canView ? talent.privateContact : null}
+            contact={
+              canView && talent.privateContact
+                ? {
+                    email: talent.privateContact.email,
+                    phone: talent.privateContact.phone,
+                    agentName: talent.privateContact.agentName,
+                    agentEmail: talent.privateContact.agentEmail,
+                    agentPhone: talent.privateContact.agentPhone,
+                    agentOnly: talent.privateContact.agentOnly,
+                  }
+                : null
+            }
           />
         </div>
       </div>
