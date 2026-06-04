@@ -1,1 +1,16 @@
+# Copy to .dev.vars for local wrangler dev / opennext preview.
+# Production vars live in Cloudflare Worker Settings (dashboard).
+# keep_vars=true in wrangler.jsonc prevents git deploys from deleting them.
+
 NEXTJS_ENV=development
+DATABASE_URL=postgresql://user:pass@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXTAUTH_SECRET=local-dev-secret-change-me
+STRIPE_PUBLIC_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+SUPPORT_EMAIL=talents@finding11.com
+REFUND_DAYS=3
+TURNSTILE_SITE_KEY=
+TURNSTILE_SECRET_KEY=
