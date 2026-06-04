@@ -4,6 +4,7 @@ import { getDb } from "@/lib/prisma";
 import { canViewPrivateContact } from "@/lib/access";
 import { getUnlockPriceCents } from "@/lib/pricing";
 import { ContactGate } from "@/components/contact-gate";
+import { HighlightVideo } from "@/components/highlight-video";
 import { isMinor } from "@/lib/utils";
 import type { Role } from "@prisma/client";
 
@@ -119,11 +120,11 @@ export default async function TalentProfilePage({
                 {talent.media.map((m) => (
                   <div key={m.id} className="overflow-hidden rounded-lg border border-white/10">
                     {m.type === "video" ? (
-                      <video
+                      <HighlightVideo
                         src={m.url}
-                        controls
-                        className="w-full"
-                        poster={m.thumbUrl ?? undefined}
+                        poster={m.thumbUrl}
+                        title={m.title ?? "Highlight"}
+                        mode="player"
                       />
                     ) : (
                       // eslint-disable-next-line @next/next/no-img-element

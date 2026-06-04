@@ -23,9 +23,15 @@ export async function SiteHeader() {
           <LocaleLink href="/discover" className="hover:text-white">
             {t("talents")}
           </LocaleLink>
-          <LocaleLink href="/signup?role=recruiter" className="hover:text-white">
-            {t("recruiters")}
-          </LocaleLink>
+          {session?.user ? (
+            <LocaleLink href="/dashboard" className="hover:text-white">
+              Dashboard
+            </LocaleLink>
+          ) : (
+            <LocaleLink href="/signup?role=recruiter" className="hover:text-white">
+              {t("recruiters")}
+            </LocaleLink>
+          )}
         </nav>
         <div className="flex items-center gap-2">
           {session?.user ? (
