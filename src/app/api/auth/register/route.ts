@@ -73,9 +73,12 @@ export async function POST(req: Request) {
           displayName: body.displayName,
           birthDate,
           guardianConsentId,
-          published: minor ? false : false,
-          privateContact: { create: {} },
+          published: false,
         },
+      });
+
+      await prisma.privateContact.create({
+        data: { talentId: talent.id },
       });
 
       if (minor && guardianConsentId) {

@@ -37,13 +37,24 @@ export async function POST(req: Request) {
         data: { status: "PAID" },
       });
 
-      await prisma.accessGrant.upsert({
+      const existingGrant = await prisma.accessGrant.findUnique({
         where: {
           recruiterId_talentId: { recruiterId, talentId },
         },
-        create: { recruiterId, talentId },
-        update: { revoked: false },
       });
+
+      if (existingGrant) {
+        await prisma.accessGrant.update({
+          where: {
+            recruiterId_talentId: { recruiterId, talentId },
+          },
+          data: { revoked: false },
+        });
+      } else {
+        await prisma.accessGrant.create({
+          data: { recruiterId, talentId },
+        });
+      }
 
       await logAudit("contact_unlocked", {
         userId: recruiterId,
