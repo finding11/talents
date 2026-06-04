@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { canViewPrivateContact } from "@/lib/access";
 import { getUnlockPriceCents } from "@/lib/pricing";
 import { ContactGate } from "@/components/contact-gate";
@@ -21,6 +21,7 @@ export default async function TalentProfilePage({
   const { unlocked } = await searchParams;
   const session = await getServerSession(authOptions);
 
+  const prisma = getDb();
   const talent = await prisma.talentProfile.findUnique({
     where: { slug },
     include: {

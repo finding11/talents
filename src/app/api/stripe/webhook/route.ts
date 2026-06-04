@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import type Stripe from "stripe";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { logAudit } from "@/lib/access";
 
@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     const talentId = session.metadata?.talentId;
 
     if (recruiterId && talentId) {
+      const prisma = getDb();
       await prisma.payment.updateMany({
         where: { stripeSessionId: session.id },
         data: { status: "PAID" },
@@ -59,6 +60,7 @@ export async function POST(req: Request) {
       const sessions = await stripe.checkout.sessions.list({ limit: 100 });
       const match = sessions.data.find((s) => s.payment_intent === paymentIntentId);
       if (match?.metadata?.recruiterId && match.metadata.talentId) {
+        const prisma = getDb();
         await prisma.payment.updateMany({
           where: { stripeSessionId: match.id },
           data: { status: "REFUNDED", refundedAt: new Date() },

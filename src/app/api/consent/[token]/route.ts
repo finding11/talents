@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { hashIp } from "@/lib/utils";
 
 export async function POST(
@@ -10,6 +10,7 @@ export async function POST(
   const body = await req.json();
   const { guardianName, relationship, email, signature } = body;
 
+  const prisma = getDb();
   const consent = await prisma.guardianConsent.findUnique({
     where: { token },
     include: { talentProfile: true },

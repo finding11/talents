@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { getStripe, assertStripeTestModeInStaging } from "@/lib/stripe";
 import { getUnlockPriceCents } from "@/lib/pricing";
 
@@ -17,6 +17,7 @@ export async function POST(req: Request) {
     }
 
     const { talentId, talentSlug } = await req.json();
+    const prisma = getDb();
     const talent = await prisma.talentProfile.findFirst({
       where: { id: talentId, slug: talentSlug, published: true },
       include: { privateContact: true },

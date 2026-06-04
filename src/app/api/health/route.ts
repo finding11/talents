@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,7 @@ export async function GET() {
   }
 
   try {
+    const prisma = getDb();
     const count = await prisma.talentProfile.count();
     diagnostics.dbOk = true;
     diagnostics.talentCount = count;

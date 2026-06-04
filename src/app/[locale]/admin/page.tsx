@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { getSiteSettings } from "@/lib/pricing";
 import { formatEUR } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ export default async function AdminPage() {
   if (!session?.user || session.user.role !== "ADMIN") redirect("/en/login");
 
   const settings = await getSiteSettings();
+  const prisma = getDb();
   const pendingTalents = await prisma.talentProfile.findMany({
     where: { published: false },
     take: 20,

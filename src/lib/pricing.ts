@@ -1,7 +1,8 @@
 import type { PricingTier, SiteSettings, TalentProfile } from "@prisma/client";
-import { prisma } from "./prisma";
+import { getDb } from "./prisma";
 
 export async function getSiteSettings(): Promise<SiteSettings> {
+  const prisma = getDb();
   const settings = await prisma.siteSettings.findUnique({ where: { id: "default" } });
   if (settings) return settings;
   return prisma.siteSettings.create({

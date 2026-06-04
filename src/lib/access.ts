@@ -1,5 +1,5 @@
 import type { Role } from "@prisma/client";
-import { prisma } from "./prisma";
+import { getDb } from "./prisma";
 
 export async function canViewPrivateContact(
   talentId: string,
@@ -9,6 +9,7 @@ export async function canViewPrivateContact(
   if (!userId) return false;
   if (role === "ADMIN") return true;
 
+  const prisma = getDb();
   const talent = await prisma.talentProfile.findUnique({
     where: { id: talentId },
     select: { userId: true },
@@ -30,6 +31,7 @@ export async function logAudit(
   action: string,
   opts: { userId?: string; talentId?: string; metadata?: object; ip?: string }
 ) {
+  const prisma = getDb();
   await prisma.auditLog.create({
     data: {
       action,

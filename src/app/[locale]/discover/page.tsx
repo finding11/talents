@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { TalentCard } from "@/components/talent-card";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +13,7 @@ export default async function DiscoverPage({
   const { locale } = await params;
   const { q, position } = await searchParams;
 
+  const prisma = getDb();
   const talents = await prisma.talentProfile.findMany({
     where: {
       published: true,

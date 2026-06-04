@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { slugify, isMinor } from "@/lib/utils";
 
 const schema = z.object({
@@ -18,6 +18,7 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const prisma = getDb();
     const body = schema.parse(await req.json());
     const email = body.email.toLowerCase();
 

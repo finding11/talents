@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getDb } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
 import { formatEUR } from "@/lib/utils";
 
@@ -10,6 +10,8 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/en/login");
+
+  const prisma = getDb();
 
   if (session.user.role === "TALENT") {
     const profile = await prisma.talentProfile.findUnique({

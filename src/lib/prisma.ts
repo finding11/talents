@@ -1,9 +1,8 @@
+import { cache } from "react";
 import { PrismaClient } from "@prisma/client";
 import { neonConfig } from "@neondatabase/serverless";
 import { PrismaNeonHTTP } from "@prisma/adapter-neon";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
 function normalizeDatabaseUrl(url: string): string {
   try {
@@ -50,18 +49,11 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-function getPrismaClient(): PrismaClient {
-  if (!globalForPrisma.prisma) {
-    globalForPrisma.prisma = createPrismaClient();
-  }
-  return globalForPrisma.prisma;
-}
+/** Per-request Prisma client — required for Cloudflare Workers (OpenNext). */
+export const getDb = cache(() => createPrismaClient());
 
-/** Lazy singleton — avoids requiring DATABASE_URL during Next.js build. */
-export const prisma = new Proxy({} as PrismaClient, {
-  get(_target, prop, receiver) {
-    const client = getPrismaClient();
-    const value = Reflect.get(client, prop, receiver);
-    return typeof value === "function" ? value.bind(client) : value;
-  },
-});
+/** For static/ISR routes that need async Cloudflare context. */
+export async function getDbAsync() {
+  await getCloudflareContext({ async: true });
+  return createPrismaClient();
+}
