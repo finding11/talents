@@ -9,9 +9,25 @@ export function getAuthOptions(): NextAuthOptions {
   const url = readRuntimeEnv("NEXTAUTH_URL") ?? readRuntimeEnv("NEXT_PUBLIC_APP_URL");
   if (url) process.env.NEXTAUTH_URL ??= url;
 
+  const useSecureCookies = (url ?? "").startsWith("https://");
+
   return {
     secret,
+    useSecureCookies,
     session: { strategy: "jwt" },
+    cookies: {
+      sessionToken: {
+        name: useSecureCookies
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+        options: {
+          httpOnly: true,
+          sameSite: "lax",
+          path: "/",
+          secure: useSecureCookies,
+        },
+      },
+    },
     pages: {
       signIn: "/en/login",
       error: "/en/login",
@@ -52,6 +68,7 @@ export function getAuthOptions(): NextAuthOptions {
       async jwt({ token, user }) {
         if (user) {
           token.id = user.id;
+          token.email = user.email;
           token.role = (user as { role: string }).role;
         }
         return token;
@@ -59,6 +76,7 @@ export function getAuthOptions(): NextAuthOptions {
       async session({ session, token }) {
         if (session.user) {
           session.user.id = token.id as string;
+          session.user.email = token.email as string;
           session.user.role = token.role as string;
         }
         return session;

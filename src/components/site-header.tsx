@@ -1,9 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { Button } from "./ui/button";
+import { getSession } from "@/lib/session";
 
 export async function SiteHeader() {
   const t = await getTranslations("common");
+  const session = await getSession();
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-navy-900/80 backdrop-blur-md">
@@ -25,12 +27,20 @@ export async function SiteHeader() {
           </Link>
         </nav>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">{t("login")}</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/signup/talent">{t("signup")}</Link>
-          </Button>
+          {session?.user ? (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/login">{t("login")}</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/signup/talent">{t("signup")}</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

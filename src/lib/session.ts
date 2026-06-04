@@ -1,5 +1,5 @@
+import { cookies } from "next/headers";
 import { getToken } from "next-auth/jwt";
-import { headers } from "next/headers";
 import { readRuntimeEnv } from "./runtime-env";
 
 export type AppSession = {
@@ -12,22 +12,34 @@ export type AppSession = {
 
 export async function getSession(): Promise<AppSession | null> {
   try {
-    const headersList = await headers();
+    const secret = readRuntimeEnv("NEXTAUTH_SECRET");
+    if (!secret) return null;
+
+    const url = readRuntimeEnv("NEXTAUTH_URL") ?? readRuntimeEnv("NEXT_PUBLIC_APP_URL") ?? "";
+    if (url) process.env.NEXTAUTH_URL ??= url;
+
+    const cookieStore = await cookies();
     const token = await getToken({
-      req: { headers: headersList } as Parameters<typeof getToken>[0]["req"],
-      secret: readRuntimeEnv("NEXTAUTH_SECRET"),
+      req: {
+        headers: {
+          cookie: cookieStore.toString(),
+        },
+      } as Parameters<typeof getToken>[0]["req"],
+      secret,
+      secureCookie: url.startsWith("https://"),
     });
 
-    if (!token?.email) return null;
+    if (!token?.email || !token.id) return null;
 
     return {
       user: {
         id: token.id as string,
-        email: token.email,
+        email: token.email as string,
         role: token.role as string,
       },
     };
-  } catch {
+  } catch (error) {
+    console.error("getSession failed", error);
     return null;
   }
 }

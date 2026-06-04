@@ -2,14 +2,13 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/en/dashboard";
   const authError = searchParams.get("error");
@@ -34,12 +33,11 @@ export default function LoginPage() {
       redirect: false,
     });
     setLoading(false);
-    if (res?.error) {
+    if (res?.error || !res?.ok) {
       setError("Invalid email or password");
       return;
     }
-    router.push(callbackUrl.startsWith("/") ? callbackUrl : "/en/dashboard");
-    router.refresh();
+    window.location.assign(callbackUrl.startsWith("/") ? callbackUrl : "/en/dashboard");
   }
 
   return (
