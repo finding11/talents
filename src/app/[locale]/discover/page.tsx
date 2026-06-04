@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/prisma";
 import { TalentCard } from "@/components/talent-card";
-import { bootstrapStaging, isStagingHost } from "@/lib/staging-bootstrap";
+import { bootstrapStaging, isStagingHost, needsStagingBootstrap } from "@/lib/staging-bootstrap";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +17,7 @@ export default async function DiscoverPage({
   const prisma = getDb();
 
   if (isStagingHost()) {
-    const mediaCount = await prisma.mediaAsset.count();
-    if (mediaCount === 0) {
+    if (await needsStagingBootstrap(prisma)) {
       await bootstrapStaging(prisma);
     }
   }

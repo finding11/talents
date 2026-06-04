@@ -18,14 +18,20 @@ export async function TalentCard({ talent, locale }: TalentCardProps) {
       className="group block overflow-hidden rounded-xl border border-white/10 bg-navy-800/50 transition hover:border-pitch-500/50 hover:shadow-lg hover:shadow-pitch-500/10"
     >
       <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-navy-700 to-pitch-900/30">
-        {highlight?.type === "video" ? (
+        {highlight?.thumbUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={highlight.thumbUrl}
+            alt={highlight.title ?? `${talent.displayName} highlights`}
+            className="h-full w-full object-cover"
+          />
+        ) : highlight?.type === "video" ? (
           <video
             src={highlight.url}
             className="h-full w-full object-cover"
             muted
             playsInline
             preload="metadata"
-            poster={highlight.thumbUrl ?? undefined}
           />
         ) : highlight?.url ? (
           // eslint-disable-next-line @next/next/no-img-element

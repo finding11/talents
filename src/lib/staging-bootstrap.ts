@@ -7,9 +7,6 @@ export function isStagingHost(): boolean {
   return url.includes("workers.dev") || url.includes("staging.");
 }
 
-const DEMO_VIDEO =
-  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
-
 const DEMO_EMAILS = [
   "admin@finding11.com",
   "recruiter@finding11.com",
@@ -17,11 +14,21 @@ const DEMO_EMAILS = [
   "elite@finding11.com",
 ];
 
+const PLAYER_HIGHLIGHTS = {
+  "marco-silva": {
+    title: "Midfield highlights",
+    url: "https://videos.pexels.com/video-files/3129679/3129679-uhd_2560_1440_25fps.mp4",
+    thumbUrl: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80",
+  },
+  "alex-rivera": {
+    title: "Winger highlights",
+    url: "https://videos.pexels.com/video-files/4770682/4770682-hd_1920_1080_24fps.mp4",
+    thumbUrl: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=800&q=80",
+  },
+} as const;
+
 export async function seedDemoHighlights(prisma: PrismaClient) {
-  for (const [slug, title] of [
-    ["alex-rivera", "Winger highlights"],
-    ["marco-silva", "Midfield highlights"],
-  ] as const) {
+  for (const [slug, media] of Object.entries(PLAYER_HIGHLIGHTS)) {
     const talent = await prisma.talentProfile.findUnique({ where: { slug } });
     if (!talent) continue;
 
@@ -30,8 +37,9 @@ export async function seedDemoHighlights(prisma: PrismaClient) {
       data: {
         talentId: talent.id,
         type: "video",
-        title,
-        url: DEMO_VIDEO,
+        title: media.title,
+        url: media.url,
+        thumbUrl: media.thumbUrl,
         status: "READY",
         sortOrder: 0,
       },
@@ -47,6 +55,21 @@ export async function resetDemoPasswords(prisma: PrismaClient) {
       data: { passwordHash },
     });
   }
+}
+
+export async function needsStagingBootstrap(prisma: PrismaClient): Promise<boolean> {
+  const mediaCount = await prisma.mediaAsset.count();
+  if (mediaCount === 0) return true;
+
+  const outdated = await prisma.mediaAsset.count({
+    where: {
+      OR: [
+        { url: { contains: "flower.mp4" } },
+        { thumbUrl: null },
+      ],
+    },
+  });
+  return outdated > 0;
 }
 
 export async function bootstrapStaging(prisma: PrismaClient) {

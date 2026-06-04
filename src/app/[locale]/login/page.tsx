@@ -1,6 +1,5 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/routing";
@@ -27,11 +26,26 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: callbackUrl.startsWith("/") ? callbackUrl : "/en/dashboard",
-    });
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(typeof data.error === "string" ? data.error : "Invalid email or password");
+        setLoading(false);
+        return;
+      }
+
+      window.location.assign(callbackUrl.startsWith("/") ? callbackUrl : "/en/dashboard");
+    } catch {
+      setError("Network error. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (

@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/routing";
+import { Link as LocaleLink } from "@/i18n/routing";
 import { Button } from "./ui/button";
 import { getSession } from "@/lib/session";
 
@@ -10,34 +11,39 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-navy-900/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
+        <LocaleLink href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold tracking-tight text-white">
             Finding<span className="text-pitch-400">11</span>
           </span>
-        </Link>
+        </LocaleLink>
         <nav className="hidden items-center gap-6 text-sm text-white/70 md:flex">
-          <Link href="/discover" className="hover:text-white">
+          <LocaleLink href="/discover" className="hover:text-white">
             {t("discover")}
-          </Link>
-          <Link href="/signup/talent" className="hover:text-white">
+          </LocaleLink>
+          <LocaleLink href="/signup/talent" className="hover:text-white">
             {t("talents")}
-          </Link>
-          <Link href="/signup/recruiter" className="hover:text-white">
+          </LocaleLink>
+          <LocaleLink href="/signup/recruiter" className="hover:text-white">
             {t("recruiters")}
-          </Link>
+          </LocaleLink>
         </nav>
         <div className="flex items-center gap-2">
           {session?.user ? (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <LocaleLink href="/dashboard">Dashboard</LocaleLink>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/api/auth/logout">Sign out</Link>
+              </Button>
+            </>
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/login">{t("login")}</Link>
+                <LocaleLink href="/login">{t("login")}</LocaleLink>
               </Button>
               <Button size="sm" asChild>
-                <Link href="/signup/talent">{t("signup")}</Link>
+                <LocaleLink href="/signup/talent">{t("signup")}</LocaleLink>
               </Button>
             </>
           )}
