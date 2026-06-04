@@ -1,27 +1,8 @@
 import { PrismaClient, Role, PricingTier } from "@prisma/client";
-import { hash } from "bcryptjs";
+import { hashPassword } from "../src/lib/password";
+import { seedDemoHighlights } from "../src/lib/staging-bootstrap";
 
 const prisma = new PrismaClient();
-
-const DEMO_VIDEO =
-  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
-
-async function seedHighlight(talentSlug: string, title: string) {
-  const talent = await prisma.talentProfile.findUnique({ where: { slug: talentSlug } });
-  if (!talent) return;
-
-  await prisma.mediaAsset.deleteMany({ where: { talentId: talent.id } });
-  await prisma.mediaAsset.create({
-    data: {
-      talentId: talent.id,
-      type: "video",
-      title,
-      url: DEMO_VIDEO,
-      status: "READY",
-      sortOrder: 0,
-    },
-  });
-}
 
 async function main() {
   await prisma.siteSettings.upsert({
@@ -36,7 +17,7 @@ async function main() {
     update: {},
   });
 
-  const passwordHash = await hash("demo12345", 12);
+  const passwordHash = await hashPassword("demo12345");
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@finding11.com" },
@@ -126,8 +107,7 @@ async function main() {
     update: {},
   });
 
-  await seedHighlight("alex-rivera", "Winger highlights");
-  await seedHighlight("marco-silva", "Midfield highlights");
+  await seedDemoHighlights(prisma);
 
   console.log("Seed complete. Demo logins (password: demo12345):");
   console.log("  admin@finding11.com (ADMIN)");

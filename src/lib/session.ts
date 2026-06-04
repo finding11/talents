@@ -1,6 +1,6 @@
-import { cookies } from "next/headers";
 import { getToken } from "next-auth/jwt";
 import { readRuntimeEnv } from "./runtime-env";
+import { getRequestCookieHeader } from "./cookies-header";
 
 export type AppSession = {
   user: {
@@ -18,11 +18,13 @@ export async function getSession(): Promise<AppSession | null> {
     const url = readRuntimeEnv("NEXTAUTH_URL") ?? readRuntimeEnv("NEXT_PUBLIC_APP_URL") ?? "";
     if (url) process.env.NEXTAUTH_URL ??= url;
 
-    const cookieStore = await cookies();
+    const cookieHeader = await getRequestCookieHeader();
+    if (!cookieHeader) return null;
+
     const token = await getToken({
       req: {
         headers: {
-          cookie: cookieStore.toString(),
+          cookie: cookieHeader,
         },
       } as Parameters<typeof getToken>[0]["req"],
       secret,

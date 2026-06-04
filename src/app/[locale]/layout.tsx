@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/site-header";
 import { TestModeBanner } from "@/components/test-mode-banner";
 import { Providers } from "@/components/providers";
 
+export const dynamic = "force-dynamic";
+
 export default async function LocaleLayout({
   children,
   params,

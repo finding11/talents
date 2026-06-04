@@ -27,17 +27,11 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const res = await signIn("credentials", {
+    await signIn("credentials", {
       email,
       password,
-      redirect: false,
+      callbackUrl: callbackUrl.startsWith("/") ? callbackUrl : "/en/dashboard",
     });
-    setLoading(false);
-    if (res?.error || !res?.ok) {
-      setError("Invalid email or password");
-      return;
-    }
-    window.location.assign(callbackUrl.startsWith("/") ? callbackUrl : "/en/dashboard");
   }
 
   return (

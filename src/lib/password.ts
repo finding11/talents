@@ -1,4 +1,4 @@
-const PBKDF2_ITERATIONS = 100_000;
+const PBKDF2_ITERATIONS = 31_000;
 
 function bytesToBase64(bytes: Uint8Array): string {
   let binary = "";
