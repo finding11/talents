@@ -20,10 +20,10 @@ export async function SiteHeader() {
           <LocaleLink href="/discover" className="hover:text-white">
             {t("discover")}
           </LocaleLink>
-          <LocaleLink href="/signup/talent" className="hover:text-white">
+          <LocaleLink href="/discover" className="hover:text-white">
             {t("talents")}
           </LocaleLink>
-          <LocaleLink href="/signup/recruiter" className="hover:text-white">
+          <LocaleLink href="/signup?role=recruiter" className="hover:text-white">
             {t("recruiters")}
           </LocaleLink>
         </nav>
@@ -43,7 +43,7 @@ export async function SiteHeader() {
                 <LocaleLink href="/login">{t("login")}</LocaleLink>
               </Button>
               <Button size="sm" asChild>
-                <LocaleLink href="/signup/talent">{t("signup")}</LocaleLink>
+                <LocaleLink href="/signup">{t("signup")}</LocaleLink>
               </Button>
             </>
           )}
